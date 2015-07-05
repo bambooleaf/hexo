@@ -1,0 +1,293 @@
+title: "package.json详解"
+date: 2015-05-16 10:12:41
+categories: 学习笔记
+tags: [nodejs,package.json]
+
+---
+
+
+# package.json文件详解
+
+## name
+**必须** 字段
+下面是官方的建议：
+
+- 名字里不要再包含"js"和"node"，因为默认NPM包就是node.js程序，不过你可以通过engines字段来指定。
+- 名字将会被作为url的一部分，所有要符合http url的一般命名规则，不能包含url非法字符，也不能以.和_开头。
+- 名字也将作为require()命令的参数，所以应该尽量简明。
+- 如果包要发布到NPM平台上的话，最好先检查下有没有重名, 并且字母只能全部小写。
+新版本的NPM可以指定scope, 名字可以加前缀标识，如@ijse/mypackage。
+
+<!--more-->
+
+##version
+**必须** 字段
+在package.json中最重要的就是name和version字段。他们都是必须的，如果没有就无法install。name和version一起组成的标识在假设中是唯一的。改变包应该同时改变version。
+
+version必须能被 [node-semver][1]解析，它被包在npm的依赖中。（要自己用可以执行npm install semver）
+
+更多可用的“数字”或者“范围”见[semver(7)][2].
+
+##description
+可选字段
+包的描述信息，将会在npm search的返回结果中显示，以帮助用户选择合适的包。
+
+##keywords
+可选字段
+包的关键词信息，是一个字符串数组，同上也将显示在npm search的结果中。
+
+##homepage
+可选字段
+**没有** http://等带协议前缀的URL。
+
+##bugs
+可选字段
+你项目的提交问题的url和（或）邮件地址。
+> bugs: {  
+>  "url": "http://github.com/ijse/project/issues",
+>  "email": "my@ijser.cn"
+>}
+
+##license
+可选字段
+包的开源协议名称
+如果是使用一个普遍的license，比如BSD-3-Clause或MIT，直接使用：
+
+>{ "license" :"BSD-3-Clause"}
+
+如果你有更复杂的许可条件，或者想要提供给更多地细节，可以这样:
+>"licenses" : [
+  { "type" : "MyLicense"
+  , "url" : "http://github.com/owner/project/path/to/license"
+  }
+]
+
+##author
+可选字段
+包的作者，可以是字符串或对象
+>author: {  
+  "name": "ijse",
+  "email": "my@ijse.cn",
+  "url": "http://www.ijser.cn"
+}
+
+或者
+>author: "ijse <my@ijser.cn> (http://www.ijser.cn)"  
+
+##contributors
+可选字段
+包的贡献者，是一个数组
+
+##files
+可选字段
+包所包含的所有文件，可以取值为文件夹。
+
+通常我们还是用.npmignore来去除不想包含到包里的文件。
+
+##main
+可选字段
+这个字段的值是你程序主入口模块的ID。如果其他用户需要你的包，当用户调用require()方法时，返回的就是这个模块的导出（exports）。
+
+##bin
+可选字段
+如果你的包里包含可执行文件，通过设置这个字段可以将它们包含到系统的PATH中，这样直接就可以运行，很方便。如：
+
+>"bin": {
+  "iapp": "./cli.js"
+}
+
+当包被安装后，NPM将创建一个cli.js文件的链接到/usr/local/bin/iapp下。
+
+##man
+
+
+为系统的man命令提供帮助文档, 如：
+
+>"man": "./man/doc.1"
+
+帮助文件的文件名必须以数字结尾，如果是压缩的，需要以.gz结尾。
+
+如果是字符串数组：
+
+>"name": "foo",
+"man": ["./man/foo.1", "./man/bar.1", "./man/foo.2" ]
+
+则分别可以man foo, man foo-bar, man 2 foo来查看。
+
+##directories
+CommonJS包所要求的目录结构信息，目前除了告诉别人你的程序目录结构，貌似没有别的什么用。
+下级字段可以是：lib, bin, man, doc, example。 每个都是字符串
+
+##repository
+可选字段
+用于指示代码存放的位置
+>"repository" :
+  { "type" : "git"
+  , "url" : "http://github.com/npm/npm.git"
+  }
+"repository" :
+  { "type" : "svn"
+  , "url" : "http://v8.googlecode.com/svn/trunk/"
+  }
+  
+  
+##script
+“scripts”是一个由脚本命令组成的hash对象，他们在包不同的生命周期中被执行。key是生命周期事件，value是要运行的命令。
+
+参见 [npm-scripts(7)][3]
+
+##config
+可选字段
+添加一些设置，可以供scripts读取用，同时这里的值也会被添加到系统的环境变量中。
+
+>"name": "foo",
+"config": {
+  "port": "8080"
+}
+
+npm start的时候会读取到npm_package_config_port环境变量。
+
+同时也可以使用npm config命令来修改设置：
+
+>npm config set foo:port 8001  
+
+##dependencies
+可选字段
+指定依赖的其它包，这些依赖是指包发布后正常执行时所需要的，如果是开发中依赖的包，可以在devDependencies设置。
+
+通常使用下面命令来安装：
+
+>npm install --save otherpackage  
+
+形式可以有如下多种：
+
++ version 严格匹配某个版本
++    >version 必须大于某个版本
++    >=version
++    <version
++    <=version
++    ~version 大概匹配某个版本
++    ^version 兼容某个版本
++    1.2.x 可以是1.2.0, 1.2.1等等，但不能是1.3.0
++    http://... 指定tarball的url地址
++    * 任何版本都可以
++    "" 同上
++    version1 - version2 >=version1 <=version2
++    range1 || range2 满足range1 或range2
++    git://... git地址
++    user/repo 同上
++    tag 指定某个tag的版本
++    path/path 本地包所有文件夹
+
+下面都是可以用的：
+
+>{ "dependencies" :
+  { "foo" : "1.0.0 - 2.9999.9999"
+  , "bar" : ">=1.0.2 <2.1.2"
+  , "baz" : ">1.0.2 <=2.3.4"
+  , "boo" : "2.0.1"
+  , "qux" : "<1.0.0 || >=2.3.1 <2.4.5 || >=2.5.2 <3.0.0"
+  , "asd" : "http://asdf.com/asdf.tar.gz"
+  , "til" : "~1.2"
+  , "elf" : "~1.2.3"
+  , "two" : "2.x"
+  , "thr" : "3.3.x"
+  , "lat" : "latest"
+  , "dyl" : "file:../dyl"
+  }
+}
+
+Git URL可以有如下种形式：
+
+>git://github.com/user/project.git#commit-ish  
+git+ssh://user@hostname:project.git#commit-ish  
+git+ssh://user@hostname/project.git#commit-ish  
+git+http://user@hostname/project/blah.git#commit-ish  
+git+https://user@hostname/project/blah.git#commit-ish  
+
+
+
+
+##devdependencies
+这些依赖只有在开发时候才需要。
+
+>npm install --save-dev mypack  
+
+##peerDependencies
+
+相关的依赖，如果你的包是插件，而用户在使用你的包时候，通常也会需要这些依赖（插件），那么可以将依赖列到这里。
+
+举个例子，如karma, 它的package.json中有设置：
+
+>"peerDependencies": {
+  "karma-jasmine": "~0.1.0",
+  "karma-requirejs": "~0.2.0",
+  "karma-coffee-preprocessor": "~0.1.0",
+  "karma-html2js-preprocessor": "~0.1.0",
+  "karma-chrome-launcher": "~0.1.0",
+  "karma-firefox-launcher": "~0.1.0",
+  "karma-phantomjs-launcher": "~0.1.0",
+  "karma-script-launcher": "~0.1.0"
+}
+
+这些都是karma的相关插件，一般使用karma的时候都会需要。
+##bundledDependencies
+
+绑定的依赖包，发布的时候这些绑定包也会被一同发布。
+##optionalDependencies
+
+即使这些依赖没有，也可以正常安装使用
+##engines
+
+指定包运行的环境
+
+>"engines": {
+  "node": ">=0.10.3 < 0.12",
+  "npm": "~1.0.20"
+}
+
+##engineStrict
+
+设置为true强制限定 engine
+##os
+
+指定你的包可以在哪些系统平台下运行。
+
+>"os": [ "darwin", "linux", "!win32" ]
+
+即可以在darwin和linux平台下运行，而不能在win32下。这里设定的取值是来自process.platform的。
+##cpu
+
+可以指定包运行的cpu架构，如
+
+>"cpu": [ "x64", "!arm" ]
+
+取值来自process.arch。
+##preferGlobal
+
+如果你的包是命令行运行的，那可以将其设置为true建议用户全局(npm install -g)安装。但它并不强制用户。
+##private
+
+设为true这个包将不会发布到NPM平台下。
+##publishConfig
+
+这个字段用于设置发布时候的一些设定。尤其方便你希望发布前设定指定的tag或registry。
+
+也可以设定其它子字段，但只有tag和registry会影响到发布。
+##默认值
+
+
++    "scripts": { "start": "node server.js" } 如果在项目根目录下含有server.js文件，则NPM会自动设置此值。
+
++    "scripts": { "preinstall": "node-gyp rebuild" }
+
+如果在项目根目录下含有binding.gyp文件，则NPM会自动设置此值。
+
++    "contributors": [...]
+
+如果项目根目录下含有AUTHORS文件，则NPM会自动将每一行以Name <email> (url)的格式读取并设定此字段。
+
+
+ [1]: https://github.com/npm/node-semver
+ [2]: https://docs.npmjs.com/misc/semver
+ [3]: https://docs.npmjs.com/misc/scripts

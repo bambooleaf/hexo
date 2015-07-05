@@ -1,0 +1,49 @@
+title: "ubuntu安装sublime2"
+date: 2015-05-23 13:10:19
+categories: 开发工具
+tags: sublime2
+---
+
+学习nodejs，也顺带着学习使用linux，但是在开发工具上悲剧了，以前用习惯了sublime，所以在linux上也要安装一个，结果就是好坑……
+
+#linux下安装sublime2流程
+
+##安装sublime2
+
+```
+sudo add-apt-repository ppa:webupd8team/sublime-text-2
+sudo apt-get update
+sudo apt-get install sublime-text
+
+//网上写的是sudo apt-get install sublime-text-2,可是在我安装的时候提示sublime2已经合并到sublime里面了，所以安装出来的就是sublime2
+```
+<!--more-->
+
+
+在ubuntu系统下，安装成功后随便找个文档，右键==>打开方式==>sublime text 2
+说明安装成功了
+
+##安装Package Control
+sublime2最收欢迎的就是各种各样的插件了
+在这里记录下我安装的全流程
+
+1,按Ctrl+`调出console
+2,粘贴以下代码到底部命令行并回车：
+import urllib2,os;pf='Package Control.sublime-package';ipp=sublime.installed_packages_path();os.makedirs(ipp) if not os.path.exists(ipp) else None;open(os.path.join(ipp,pf),'wb').write(urllib2.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read())
+3,重启Sublime Text 2。
+
+##用Package Control安装插件的方法
+
+按下Ctrl+Shift+P调出命令面板
+输入install 调出 Install Package 选项并回车，然后在列表中选中要安装的插件。
+
+
+更多插件安装可参考http://www.linuxidc.com/Linux/2013-08/89451.htm
+或http://www.cnblogs.com/wangcan/p/3845268.html
+
+
+##中文输入法问题
+ubuntu下，sublime的中文输入有问题，我就懒得解决了，因为我用的是ibus……
+看看以后是换成webstorm还是微软的visio studio code吧
+
+

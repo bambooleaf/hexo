@@ -1,0 +1,20 @@
+title: "ubuntu 安装visual studio code"
+date: 2015-05-14 23:55:40
+categories: 学习笔记
+tags: (工具)
+---
+- 安装微软 Visual Studio Code
+   
+打开终端，使用下列命令，通过官方 PPA 来安装 Ubuntu Make： 
+> sudo add-apt-repository ppa:ubuntu-desktop/ubuntu-make
+> sudo apt-get update
+> sudo apt-get install ubuntu-make
+
+安装 Ubuntu Make 完后，接着使用下列命令安装 Visual Studio Code： 
+
+> umake web visual-studio-code
+
+ - 卸载微软 Visual Studio Code
+ 
+
+> umake web visual-studio-code --remove
